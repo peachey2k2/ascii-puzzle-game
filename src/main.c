@@ -182,10 +182,10 @@ bool moveTo(int key, bool undo){
         }
     } else {
         // if (!vectorCompare(movePacket.pos, ZERO)){
-        if (getFlag(FLAGS_WARP)){
-            playerPos = movePacket.pos;
-            return true;
-        }
+        // if (getFlag(FLAGS_WARP)){
+        //     playerPos = movePacket.pos;
+        //     return true;
+        // }
         if (getFlag(FLAGS_ROCK_MOVED)){
             Vector2i rockOldPos = vectorAdd(playerPos, move);
             if (getItemInLayer(rockOldPos, true) == 'R'){
@@ -332,19 +332,21 @@ void useItem(char item){
     switch (item){
         case 'g':
             setFlag(FLAGS_GHOST_MODE, true);
+            break;
         case 'm':
             if (NodePositions.a.x > 0 && NodePositions.b.x > 0){
-                movePacket.pos = playerPos;
-                // moveHistory[moveHistoryIndex-1].pos = playerPos;
-                // moveHistory[moveHistoryIndex-1].flags |= 0x1000;
+                // movePacket.pos = playerPos;
+                moveHistory[moveHistoryIndex-1].pos = playerPos;
                 if (cycle){
                     playerPos = NodePositions.a;
                 } else {
                     playerPos = NodePositions.b;
                 }
                 cycle = !cycle;
-                setFlag(FLAGS_WARP, true);
+                // setFlag(FLAGS_WARP, true);
+                moveHistory[moveHistoryIndex-1].flags |= 0b1000;
             }
+            break;
     }
 }
 
@@ -450,6 +452,7 @@ bool handleInput(){
     movePacket.movedObjectCount = 0;
     movePacket.pos = ZERO;
     // movePacket.usedItem.item = 0;
+    // printf("%c\n", getOnTop());
 
     setFlag(FLAGS_ROCK_MOVED, false);
     if (getFlag(FLAGS_DEATH)){
@@ -479,6 +482,10 @@ undo:   if (moveHistoryIndex > 0){
                 MovedObject obj = movePacket.movedObjects[i];
                 setItemInLayer('.', obj.newPos, isLayer2(obj.tile));
                 setItemInLayer(obj.tile, obj.oldPos, isLayer2(obj.tile));
+            }
+
+            if (getFlag(FLAGS_WARP)){
+                playerPos = movePacket.pos;
             }
 
             switch (movePacket.button){
@@ -523,7 +530,7 @@ undo:   if (moveHistoryIndex > 0){
         out = false;
         for (int i = 1; i <= 5; i++){
             if (isItemUsable(i) && checkKey(KEY_ZERO + i)){
-                useItem(movePacket.items[i-1]);
+                // useItem(movePacket.items[i-1]);
                 // movePacket.items[i-1] = ' ';
                 usedItem = i;
                 moved = true;
@@ -546,12 +553,19 @@ undo:   if (moveHistoryIndex > 0){
                 isDead = true;
             }
         }
+        if (getFlag(FLAGS_WARP)){
+            setFlag(FLAGS_WARP, false);
+        }
         moveHistory[moveHistoryIndex] = movePacket;
         moveHistoryIndex++;
         stamina--;
         addedItem = '\0';
         if (usedItem > 0){
-            movePacket.items[usedItem-1] = ' ';
+            useItem(movePacket.items[usedItem-1]);
+            movePacket.items[usedItem-1] = ' '; 
+            // switch (usedItem){
+            //     case 'g': 
+            // }
         }
         if (isDead){
             setFlag(FLAGS_DEATH, true);

@@ -265,7 +265,7 @@ void openChest(){
         int i;
         for (i=0; i<5; i++){
             if (movePacket.items[i] == ' '){
-                movePacket.items[i] = loot.loot;
+                // movePacket.items[i] = loot.loot; // trolled
                 break;
             }
         }
@@ -559,7 +559,15 @@ undo:   if (moveHistoryIndex > 0){
         moveHistory[moveHistoryIndex] = movePacket;
         moveHistoryIndex++;
         stamina--;
-        addedItem = '\0';
+        if (addedItem != '\0'){
+            for (int i=0; i<5; i++){
+                if (movePacket.items[i] == ' '){
+                    movePacket.items[i] = addedItem;
+                    break;
+                }
+            }
+            addedItem = '\0';
+        }
         if (usedItem > 0){
             useItem(movePacket.items[usedItem-1]);
             movePacket.items[usedItem-1] = ' '; 

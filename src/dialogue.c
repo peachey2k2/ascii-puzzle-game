@@ -39,7 +39,7 @@ bool proceedDialogue(){
         fgets(dialogueText[i], 25, dialogueFile);
     }
     if (dialogueText[0][0] == '/'){
-        printf("End of dialogue\n");
+        // printf("End of dialogue\n");
         dialogue = false;
         return false;
     }

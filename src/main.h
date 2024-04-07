@@ -11,6 +11,7 @@ enum FLAGS{
     FLAGS_DEATH,
     FLAGS_ROCK_MOVED,
     FLAGS_GHOST_MODE,
+    FLAGS_WARP,
 };
 
 struct ShaderParams{
@@ -37,6 +38,7 @@ typedef struct MovedObject{
 typedef struct MovePacket{
     int button;
     char items[5];
+    Vector2i pos;
     // struct UsedItem usedItem;
     MovedObject movedObjects[10];
     int movedObjectCount;

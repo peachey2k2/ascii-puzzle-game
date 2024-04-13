@@ -12,6 +12,7 @@ enum FLAGS{
     FLAGS_ROCK_MOVED,
     FLAGS_GHOST_MODE,
     FLAGS_WARP,
+    FLAGS_APPLE,
 };
 
 struct ShaderParams{

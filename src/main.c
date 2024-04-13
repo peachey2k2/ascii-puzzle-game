@@ -344,9 +344,13 @@ void useItem(char item){
                 }
                 cycle = !cycle;
                 // setFlag(FLAGS_WARP, true);
-                moveHistory[moveHistoryIndex-1].flags |= 0b1000;
+                moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_WARP;
             }
             break;
+        case 'a':
+            // setFlag(FLAGS_APPLE, true);
+            moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_APPLE;
+            stamina += 50;
     }
 }
 
@@ -487,6 +491,9 @@ undo:   if (moveHistoryIndex > 0){
             if (getFlag(FLAGS_WARP)){
                 playerPos = movePacket.pos;
             }
+            if (getFlag(FLAGS_APPLE)){
+                stamina -= 50;
+            }
 
             switch (movePacket.button){
                 case KEY_UP:
@@ -559,6 +566,9 @@ undo:   if (moveHistoryIndex > 0){
         moveHistory[moveHistoryIndex] = movePacket;
         moveHistoryIndex++;
         stamina--;
+        if (getFlag(FLAGS_APPLE)){
+            setFlag(FLAGS_APPLE, false);
+        }
         if (addedItem != '\0'){
             for (int i=0; i<5; i++){
                 if (movePacket.items[i] == ' '){

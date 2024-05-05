@@ -32,7 +32,7 @@ int undoCount = 0;
 int stamina = 999;
 float holdTimer = 0;
 int consecutiveUndos = 0;
-int inGameClockTimer;
+unsigned int inGameClockTimer;
 
 bool dialogue = false;
 char **dialogueText;
@@ -144,6 +144,9 @@ bool moveTo(int key, bool undo){
 
     if (!undo){
         if (!getFlag(FLAGS_GHOST_MODE)){
+            if (newPos.x == 64 && newPos.y == 11){
+                return false;
+            }
             switch (getItem(newPos)){
                 case '#':
                     return false;
@@ -345,6 +348,14 @@ void useItem(char item){
                 cycle = !cycle;
                 // setFlag(FLAGS_WARP, true);
                 moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_WARP;
+            } else if (NodePositions.a.x > 0){
+                moveHistory[moveHistoryIndex-1].pos = playerPos;
+                playerPos = NodePositions.a;
+                moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_WARP;
+            } else if (NodePositions.b.x > 0){
+                moveHistory[moveHistoryIndex-1].pos = playerPos;
+                playerPos = NodePositions.b;
+                moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_WARP;
             }
             break;
         case 'a':
@@ -428,6 +439,8 @@ void moveEnemy(char enemy, Vector2i pos){
             if (vectorCompare(newPos, ZERO)) return;
             movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){pos, newPos, 'e'};
             setItemInLayer('.', pos, true);
+            if (getItemInLayer(pos, false) == '_') releasePlate(pos);
+            if (getItemInLayer(newPos, false) == '_') pressPlate(newPos);
             break;
     }
 }
@@ -486,6 +499,8 @@ undo:   if (moveHistoryIndex > 0){
                 MovedObject obj = movePacket.movedObjects[i];
                 setItemInLayer('.', obj.newPos, isLayer2(obj.tile));
                 setItemInLayer(obj.tile, obj.oldPos, isLayer2(obj.tile));
+                if (getItemInLayer(obj.oldPos, false) == '_') pressPlate(obj.oldPos);
+                if (getItemInLayer(obj.newPos, false) == '_') releasePlate(obj.newPos);
             }
 
             if (getFlag(FLAGS_WARP)){

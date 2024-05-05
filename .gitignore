@@ -23,3 +23,6 @@ game
 *.tmp
 *.swp
 *.bak
+
+# cheeky install script
+.test

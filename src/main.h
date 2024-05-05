@@ -47,7 +47,7 @@ typedef struct MovePacket{
 } MovePacket;
 
 const Vector2i windowSize = {640, 480};
-const Vector2i mapSize = {20, 20};
+const Vector2i mapSize = {1000, 1000};
 const Vector2i visibleMapSize = {31, 21};
 const Vector2i center = {15, 10};
 

@@ -40,10 +40,16 @@ void colorItem(int pos, char item){
             break;
         case 'R':
         case 'r':
-            addColorToVisibleMap(pos, 0.9, 0.3, 0.4, 1);
+            addColorToVisibleMap(pos, 0.9, 0.3, 0.7, 1);
             break;
         case 'e':
             addColorToVisibleMap(pos, 0.9, 0.3, 0.4, 1);
+            break;
+        case '<':
+        case '>':
+        case '^':
+        case 'V':
+            addColorToVisibleMap(pos, 0.7, 0.9, 0.7, 1);
             break;
         default:
             addColorToVisibleMap(pos, 0.5, 0.5, 0.5, 1);

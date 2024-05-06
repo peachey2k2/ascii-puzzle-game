@@ -81,13 +81,13 @@ Vector2 getScreenPos(Vector2i gridPos){
 Vector2i keyToVector(int key){
     switch (key){
         case KEY_UP:
-            return (Vector2i){0, -1};
+            return UP;
         case KEY_DOWN:
-            return (Vector2i){0, 1};
+            return DOWN;
         case KEY_LEFT:
-            return (Vector2i){-1, 0};
+            return LEFT;
         case KEY_RIGHT:
-            return (Vector2i){1, 0};
+            return RIGHT;
     }
     return (Vector2i){0, 0};
 }
@@ -132,6 +132,60 @@ char getOnTop(){
 
 void setOnTop(char c){
     setItem(c, playerPos);
+}
+
+int toVisibleMapPos(Vector2i pos){
+    return (visibleMapSize.x + 1) * (pos.y - playerPos.y + center.y) + (pos.x - playerPos.x + center.x);
+}
+
+Vector2i toMapPosI(int pos){
+    return (Vector2i){(pos % (visibleMapSize.x + 1)) + playerPos.x - center.x, (pos / (visibleMapSize.x + 1)) + playerPos.y - center.y};
+}
+
+Vector2i toMapPosV(Vector2i pos){
+    return (Vector2i){pos.x + playerPos.x - center.x, pos.y + playerPos.y - center.y};
+}
+
+bool isOutOfBounds(Vector2i pos){
+    return pos.x < 0 || pos.x >= mapSize.x || pos.y < 0 || pos.y >= mapSize.y;
+}
+
+float getAngleTo(Vector2i a, Vector2i b){
+    return atan2(b.y - a.y, -(b.x - a.x)); // -x because the y axis is inverted
+}
+
+bool isEnemy(char c){
+    switch (c){
+        case 'e':
+        case 'E':
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool isMoveable(Vector2i pos, Vector2i move){
+    Vector2i newPos = vectorAdd(pos, move);
+    if (isOutOfBounds(newPos)) return false;
+    char item = getItem(newPos);
+    switch (item){
+        case '#':
+        case 'R':
+        case 'A':
+        case 'B':
+            return false;
+        case 'D':
+            if (getDoorInfo(newPos).cur < getDoorInfo(newPos).min){
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+Vector2i conveyorPush(Vector2i pos, Vector2i dir){
+    Vector2i newPos = vectorAdd(pos, dir);
+    return isMoveable(pos, dir) ? newPos : pos;
 }
 
 bool moveTo(int key, bool undo){
@@ -181,6 +235,20 @@ bool moveTo(int key, bool undo){
                     }
                     setItemInLayer('.', newPos, true);
                     setFlag(FLAGS_ROCK_MOVED, true);
+                    break;
+                case '^':
+                    newPos = conveyorPush(newPos, UP);
+                    break;
+                case 'V':
+                    newPos = conveyorPush(newPos, DOWN);
+                    break;
+                case '<':
+                    newPos = conveyorPush(newPos, LEFT);
+                    break;
+                case '>':
+                    newPos = conveyorPush(newPos, RIGHT);
+                    break;
+                    
             }
         }
     } else {
@@ -366,56 +434,6 @@ void useItem(char item){
             moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_APPLE;
             stamina += 200;
     }
-}
-
-int toVisibleMapPos(Vector2i pos){
-    return (visibleMapSize.x + 1) * (pos.y - playerPos.y + center.y) + (pos.x - playerPos.x + center.x);
-}
-
-Vector2i toMapPosI(int pos){
-    return (Vector2i){(pos % (visibleMapSize.x + 1)) + playerPos.x - center.x, (pos / (visibleMapSize.x + 1)) + playerPos.y - center.y};
-}
-
-Vector2i toMapPosV(Vector2i pos){
-    return (Vector2i){pos.x + playerPos.x - center.x, pos.y + playerPos.y - center.y};
-}
-
-bool isOutOfBounds(Vector2i pos){
-    return pos.x < 0 || pos.x >= mapSize.x || pos.y < 0 || pos.y >= mapSize.y;
-}
-
-float getAngleTo(Vector2i a, Vector2i b){
-    return atan2(b.y - a.y, -(b.x - a.x)); // -x because the y axis is inverted
-}
-
-bool isEnemy(char c){
-    switch (c){
-        case 'e':
-        case 'E':
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool isMoveable(Vector2i pos, Vector2i move){
-    Vector2i newPos = vectorAdd(pos, move);
-    if (isOutOfBounds(newPos)) return false;
-    char item = getItem(newPos);
-    switch (item){
-        case '#':
-        case 'R':
-        case 'A':
-        case 'B':
-            return false;
-        case 'D':
-            if (getDoorInfo(newPos).cur < getDoorInfo(newPos).min){
-                return false;
-            }
-            break;
-    }
-    return true;
-
 }
 
 void moveEnemy(char enemy, Vector2i pos){

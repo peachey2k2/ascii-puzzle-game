@@ -1,4 +1,4 @@
 2 2 g :a pinch of ghost powder
 3 2 m :warp to a node
 4 2 a :keeps the doctors away
-116 42 a :keeps the doctors away
+216 42 a :keeps the doctors away

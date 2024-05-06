@@ -144,7 +144,7 @@ bool moveTo(int key, bool undo){
 
     if (!undo){
         if (!getFlag(FLAGS_GHOST_MODE)){
-            if (newPos.x == 64 && newPos.y == 11){
+            if (newPos.x == 164 && newPos.y == 11){
                 return false;
             }
             switch (getItem(newPos)){
@@ -361,7 +361,7 @@ void useItem(char item){
         case 'a':
             // setFlag(FLAGS_APPLE, true);
             moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_APPLE;
-            stamina += 50;
+            stamina += 200;
     }
 }
 
@@ -507,7 +507,7 @@ undo:   if (moveHistoryIndex > 0){
                 playerPos = movePacket.pos;
             }
             if (getFlag(FLAGS_APPLE)){
-                stamina -= 50;
+                stamina -= 200;
             }
 
             switch (movePacket.button){
@@ -622,6 +622,8 @@ void killTile(Vector2i pos, char tile, bool prev){
         case '.':
         case '_':
         case 'R':
+        case 'D':
+        case 'd':
             return;
         case 'k':
             setOnTop('.');
@@ -866,6 +868,14 @@ void validateData(){
                     }
                     break;
             }
+            switch (layer2[i][j]){
+                case 'A':
+                    NodePositions.a = (Vector2i){j, i};
+                    break;
+                case 'B':
+                    NodePositions.b = (Vector2i){j, i};
+                    break;
+            }
         }
     }
 
@@ -903,14 +913,27 @@ int main(){
     readDoors();
     readPlates();
 
+    NodePositions.a = (Vector2i){0, 0};
+    NodePositions.b = (Vector2i){0, 0};
+
     #ifdef ENABLE_MAP_VALIDATION
         validateData();
     #else
         for (int i=0; i<mapSize.y; i++){
             for (int j=0; j<mapSize.x; j++){
-                if (map[i][j] == '@'){
-                    playerPos = (Vector2i){j, i};
-                    map[i][j] = '.';
+                switch (map[i][j]){
+                    case '@':
+                        playerPos = (Vector2i){j, i};
+                        map[i][j] = '.';
+                        break;
+                }
+                switch (layer2[i][j]){
+                    case 'A':
+                        NodePositions.a = (Vector2i){j, i};
+                        break;
+                    case 'B':
+                        NodePositions.b = (Vector2i){j, i};
+                        break;
                 }
             }
         }
@@ -932,8 +955,6 @@ int main(){
     shiftingColors = LoadImageColors(LoadImage("resources/shifting.png"));
     ShaderParams.modulate = GetShaderLocation(shader, "modulate");
     ShaderParams.shifting = GetShaderLocation(shader, "shifting");
-    NodePositions.a = (Vector2i){0, 0};
-    NodePositions.b = (Vector2i){0, 0};
     SetTextLineSpacing(20);
 
     SetTargetFPS(60);

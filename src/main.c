@@ -238,7 +238,7 @@ bool checkKey(int key){
     return out;
 }
 
-void placeNode(){
+bool placeNode(){
     if (playerPos.x == NodePositions.a.x && playerPos.y == NodePositions.a.y){
         NodePositions.a = (Vector2i){0, 0};
         setItemInLayer('.', playerPos, true);
@@ -255,7 +255,10 @@ void placeNode(){
         NodePositions.b = playerPos;
         if (getOnTop() == '_') pressPlate(playerPos);
         setOnTop('B');
+    } else {
+        return false;
     }
+    return true;
 }
 
 void openChest(){
@@ -299,7 +302,7 @@ bool interact(){
         case 'B':
         case '.':
         case '_':
-            placeNode();
+            moved = placeNode();
             break;
         case 'k':
             startDialogue("test");

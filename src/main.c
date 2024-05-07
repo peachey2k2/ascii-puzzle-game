@@ -236,6 +236,8 @@ bool moveTo(int key, bool undo){
                     setItemInLayer('.', newPos, true);
                     setFlag(FLAGS_ROCK_MOVED, true);
                     break;
+            }
+            switch (getItemInLayer(newPos, false)){
                 case '^':
                     newPos = conveyorPush(newPos, UP);
                     break;
@@ -836,7 +838,11 @@ void generateMap(){
     for (int i=0; i<mapSize.y; i++){
         fgets(line, mapSize.x + 5, file); //???????????????????? voodoo shit
         for (int j=0; j<mapSize.x; j++){
-            if (isLayer2(line[j])){
+            if (line[j] == '|'){
+                layer2[i][j] = 'e';
+                map[i][j] = '_';
+            }
+            else if (isLayer2(line[j])){
                 layer2[i][j] = line[j];
                 map[i][j] = '.';
             } else {

@@ -658,6 +658,8 @@ void killTile(Vector2i pos, char tile, bool prev){
             setItemInLayer('.', pos, true);
             // map[pos.y][pos.x] = '.';
             
+            if (getItemInLayer(pos, false) == '_') releasePlate(pos);
+
             if (prev){
                 bool flag = false;
                 for (int i = 0; i < moveHistory[moveHistoryIndex-1].movedObjectCount; i++){
@@ -832,6 +834,8 @@ static void UpdateDrawFrame(){
     // exit(0);
 }
 
+Vector2i multiSpawns[100];
+int multiSpawnCount = 0;
 void generateMap(){
     FILE *file = fopen("data/map.txt", "r");
     char line[mapSize.x + 5];
@@ -841,6 +845,7 @@ void generateMap(){
             if (line[j] == '|'){
                 layer2[i][j] = 'e';
                 map[i][j] = '_';
+                multiSpawns[multiSpawnCount++] = (Vector2i){j, i};
             }
             else if (isLayer2(line[j])){
                 layer2[i][j] = line[j];
@@ -939,6 +944,10 @@ int main(){
     readChestLoot();
     readDoors();
     readPlates();
+
+    for (int i=0; i<multiSpawnCount; i++){
+        pressPlate(multiSpawns[i]);
+    }
 
     NodePositions.a = (Vector2i){0, 0};
     NodePositions.b = (Vector2i){0, 0};

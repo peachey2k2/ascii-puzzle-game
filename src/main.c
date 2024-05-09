@@ -150,6 +150,10 @@ bool isOutOfBounds(Vector2i pos){
     return pos.x < 0 || pos.x >= mapSize.x || pos.y < 0 || pos.y >= mapSize.y;
 }
 
+bool isEdge(Vector2i pos){
+    return pos.x == -1 || pos.x == mapSize.x || pos.y == - 1 || pos.y == mapSize.y;
+}
+
 float getAngleTo(Vector2i a, Vector2i b){
     return atan2(b.y - a.y, -(b.x - a.x)); // -x because the y axis is inverted
 }
@@ -183,7 +187,11 @@ bool isMoveable(Vector2i pos, Vector2i move){
     return true;
 }
 
+bool warpFlag = false;
 Vector2i conveyorPush(Vector2i pos, Vector2i dir){
+    warpFlag = true;
+    movePacket.pos = pos;
+    // moveHistory[moveHistoryIndex-1].pos = pos;
     Vector2i newPos = vectorAdd(pos, dir);
     return isMoveable(pos, dir) ? newPos : pos;
 }
@@ -432,9 +440,11 @@ void useItem(char item){
             }
             break;
         case 'a':
-            // setFlag(FLAGS_APPLE, true);
             moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_APPLE;
             stamina += 200;
+        case 's':
+            moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_SANDWICH;
+            stamina += 400;
     }
 }
 
@@ -532,6 +542,9 @@ undo:   if (moveHistoryIndex > 0){
             if (getFlag(FLAGS_APPLE)){
                 stamina -= 200;
             }
+            if (getFlag(FLAGS_SANDWICH)){
+                stamina -= 400;
+            }
 
             switch (movePacket.button){
                 case KEY_UP:
@@ -601,11 +614,18 @@ undo:   if (moveHistoryIndex > 0){
         if (getFlag(FLAGS_WARP)){
             setFlag(FLAGS_WARP, false);
         }
+        if (warpFlag){
+            warpFlag = false;
+            setFlag(FLAGS_WARP, true);
+        }
         moveHistory[moveHistoryIndex] = movePacket;
         moveHistoryIndex++;
         stamina--;
         if (getFlag(FLAGS_APPLE)){
             setFlag(FLAGS_APPLE, false);
+        }
+        if (getFlag(FLAGS_SANDWICH)){
+            setFlag(FLAGS_SANDWICH, false);
         }
         if (addedItem != '\0'){
             for (int i=0; i<5; i++){
@@ -647,6 +667,10 @@ void killTile(Vector2i pos, char tile, bool prev){
         case 'R':
         case 'D':
         case 'd':
+        case '^':
+        case 'V':
+        case '<':
+        case '>':
             return;
         case 'k':
             setOnTop('.');
@@ -697,7 +721,7 @@ void updateGame(){
             char item, item2;
             Vector2i truePos = toMapPosV((Vector2i){j, i});
 
-            item = isOutOfBounds(truePos) ? '.' : map[truePos.y][truePos.x];
+            item = isOutOfBounds(truePos) ? isEdge(truePos) ? '#' : '.' : map[truePos.y][truePos.x];
             item2 = isOutOfBounds(truePos) ? '.' : layer2[truePos.y][truePos.x];
 
             if (item2 == '.'){

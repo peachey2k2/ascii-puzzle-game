@@ -2,3 +2,8 @@
 3 2 m :warp to a node
 4 2 a :keeps the doctors away
 216 42 a :keeps the doctors away
+133 36 g :a pinch of ghost powder
+156 50 s :eat before she sees
+198 52 s :you are so greedy
+254 60 a :its color seems off
+255 60 m :how will a magnet help?

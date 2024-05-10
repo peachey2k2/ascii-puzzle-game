@@ -188,9 +188,11 @@ bool isMoveable(Vector2i pos, Vector2i move){
 }
 
 bool warpFlag = false;
-Vector2i conveyorPush(Vector2i pos, Vector2i dir){
-    warpFlag = true;
-    movePacket.pos = pos;
+Vector2i conveyorPush(Vector2i pos, Vector2i dir, bool player){
+    if (player){
+        warpFlag = true;
+        movePacket.pos = pos;
+    }
     // moveHistory[moveHistoryIndex-1].pos = pos;
     Vector2i newPos = vectorAdd(pos, dir);
     return isMoveable(pos, dir) ? newPos : pos;
@@ -230,6 +232,18 @@ bool moveTo(int key, bool undo){
                                 return false;
                             }
                             break;
+                        case '^':
+                            rockNewPos = conveyorPush(rockNewPos, UP, false);
+                            goto conveyor;
+                        case 'V':
+                            rockNewPos = conveyorPush(rockNewPos, DOWN, false);
+                            goto conveyor;
+                        case '<':
+                            rockNewPos = conveyorPush(rockNewPos, LEFT, false);
+                            goto conveyor;
+                        case '>':
+                            rockNewPos = conveyorPush(rockNewPos, RIGHT, false);
+                            goto conveyor;
                         default:
                             if (isEnemy(getItem(rockNewPos))){
                                 killTile(rockNewPos, getItem(rockNewPos), false);
@@ -237,28 +251,30 @@ bool moveTo(int key, bool undo){
                                 return false;
                             }
                     }
-                    setItem('R', rockNewPos);
+                    setFlag(FLAGS_ROCK_MOVED, true);
+conveyor:           setItem('R', rockNewPos); // this is a mess but a beautiful one
                     if (getItemInLayer(newPos, false) == '_'){
                         releasePlate(newPos);
                     }
                     setItemInLayer('.', newPos, true);
-                    setFlag(FLAGS_ROCK_MOVED, true);
+                    if (!getFlag(FLAGS_ROCK_MOVED)){
+                        movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){newPos, rockNewPos, 'R'};
+                    }
                     break;
             }
             switch (getItemInLayer(newPos, false)){
                 case '^':
-                    newPos = conveyorPush(newPos, UP);
+                    newPos = conveyorPush(newPos, UP, true);
                     break;
                 case 'V':
-                    newPos = conveyorPush(newPos, DOWN);
+                    newPos = conveyorPush(newPos, DOWN, true);
                     break;
                 case '<':
-                    newPos = conveyorPush(newPos, LEFT);
+                    newPos = conveyorPush(newPos, LEFT, true);
                     break;
                 case '>':
-                    newPos = conveyorPush(newPos, RIGHT);
+                    newPos = conveyorPush(newPos, RIGHT, true);
                     break;
-                    
             }
         }
     } else {
@@ -475,6 +491,30 @@ void moveEnemy(char enemy, Vector2i pos){
             if (getItemInLayer(pos, false) == '_') releasePlate(pos);
             if (getItemInLayer(newPos, false) == '_') pressPlate(newPos);
             break;
+        case 'R':
+            for (int i=0; i<movePacket.movedObjectCount; i++){
+                if (vectorCompare(movePacket.movedObjects[i].newPos, pos)){
+                    return;
+                }
+            }
+            switch (getItemInLayer(pos, false)){
+                case '^':
+                    newPos = conveyorPush(pos, UP, false);
+                    break;
+                case 'V':
+                    newPos = conveyorPush(pos, DOWN, false);
+                    break;
+                case '<':
+                    newPos = conveyorPush(pos, LEFT, false);
+                    break;
+                case '>':
+                    newPos = conveyorPush(pos, RIGHT, false);
+                    break;
+            }
+            if (vectorCompare(newPos, ZERO)) return;
+            movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){pos, newPos, 'R'};
+            setItemInLayer('.', pos, true);
+            break;
     }
 }
 
@@ -483,7 +523,7 @@ void moveEnemies(){
         for (int j=0; j<visibleMapSize.x; j++){
             Vector2i pos = toMapPosV((Vector2i){j, i});
             char item = isOutOfBounds(pos) ? '.' : getItemInLayer(pos, true);
-            if (isEnemy(item)){
+            if (isEnemy(item) || item == 'R'){
                 moveEnemy(item, pos);
             }
         }

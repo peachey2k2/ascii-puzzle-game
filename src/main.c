@@ -221,6 +221,7 @@ bool moveTo(int key, bool undo){
                     break;
                 case 'R':
                     Vector2i rockNewPos = vectorAdd(newPos, move);
+                    // bool conveyored = false;
                     switch (getItem(rockNewPos)){
                         case '_':
                             pressPlate(rockNewPos);
@@ -234,16 +235,20 @@ bool moveTo(int key, bool undo){
                             break;
                         case '^':
                             rockNewPos = conveyorPush(rockNewPos, UP, false);
-                            goto conveyor;
+                            // conveyored = true;
+                            break;
                         case 'V':
                             rockNewPos = conveyorPush(rockNewPos, DOWN, false);
-                            goto conveyor;
+                            // conveyored = true;
+                            break;
                         case '<':
                             rockNewPos = conveyorPush(rockNewPos, LEFT, false);
-                            goto conveyor;
+                            // conveyored = true;
+                            break;
                         case '>':
                             rockNewPos = conveyorPush(rockNewPos, RIGHT, false);
-                            goto conveyor;
+                            // conveyored = true;
+                            break;
                         default:
                             if (isEnemy(getItem(rockNewPos))){
                                 killTile(rockNewPos, getItem(rockNewPos), false);
@@ -251,15 +256,17 @@ bool moveTo(int key, bool undo){
                                 return false;
                             }
                     }
-                    setFlag(FLAGS_ROCK_MOVED, true);
-conveyor:           setItem('R', rockNewPos); // this is a mess but a beautiful one
+                    // setFlag(FLAGS_ROCK_MOVED, true);
+                    setItem('R', rockNewPos); // this is a mess but a beautiful one
                     if (getItemInLayer(newPos, false) == '_'){
                         releasePlate(newPos);
                     }
                     setItemInLayer('.', newPos, true);
-                    if (!getFlag(FLAGS_ROCK_MOVED)){
-                        movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){newPos, rockNewPos, 'R'};
-                    }
+                    // if (!getFlag(FLAGS_ROCK_MOVED)){
+                    movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){newPos, rockNewPos, 'R'};
+                    // if (conveyored){
+                    //     movePacket.movedObjects[movePacket.movedObjectCount++] = (MovedObject){newPos, rockNewPos, 'R'};
+                    // }
                     break;
             }
             switch (getItemInLayer(newPos, false)){
@@ -283,25 +290,25 @@ conveyor:           setItem('R', rockNewPos); // this is a mess but a beautiful 
         //     playerPos = movePacket.pos;
         //     return true;
         // }
-        if (getFlag(FLAGS_ROCK_MOVED)){
-            Vector2i rockOldPos = vectorAdd(playerPos, move);
-            if (getItemInLayer(rockOldPos, true) == 'R'){
-                setItemInLayer('.', rockOldPos, true);
-            }
-            if (getItemInLayer(rockOldPos, false) == '_'){
-                setOnTop('R');
-                releasePlate(rockOldPos);
-            } else {
-                switch (getItemInLayer(playerPos, false)){
-                    case '_':
-                        pressPlate(playerPos);
-                    case '.':
-                    case 'D':
-                        setOnTop('R');
-                        break;
-                }
-            }
-        }
+        // if (getFlag(FLAGS_ROCK_MOVED)){
+        //     Vector2i rockOldPos = vectorAdd(playerPos, move);
+        //     if (getItemInLayer(rockOldPos, true) == 'R'){
+        //         setItemInLayer('.', rockOldPos, true);
+        //     }
+        //     if (getItemInLayer(rockOldPos, false) == '_'){
+        //         setOnTop('R');
+        //         releasePlate(rockOldPos);
+        //     } else {
+        //         switch (getItemInLayer(playerPos, false)){
+        //             case '_':
+        //                 pressPlate(playerPos);
+        //             case '.':
+        //             case 'D':
+        //                 setOnTop('R');
+        //                 break;
+        //         }
+        //     }
+        // }
     }
     playerPos = newPos;
     setOnTop(map[playerPos.y][playerPos.x]);
@@ -544,7 +551,7 @@ bool handleInput(){
     // movePacket.usedItem.item = 0;
     // printf("%c\n", getOnTop());
 
-    setFlag(FLAGS_ROCK_MOVED, false);
+    // setFlag(FLAGS_ROCK_MOVED, false);
     if (getFlag(FLAGS_DEATH)){
         if (checkKey(KEY_Z)){
             goto undo; // yes i'm using goto shut up

@@ -40,7 +40,6 @@ typedef struct MovePacket{
     int button;
     char items[5];
     Vector2i pos;
-    // struct UsedItem usedItem;
     MovedObject movedObjects[50];
     int movedObjectCount;
     int flags;

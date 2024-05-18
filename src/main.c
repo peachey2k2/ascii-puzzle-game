@@ -284,31 +284,6 @@ bool moveTo(int key, bool undo){
                     break;
             }
         }
-    } else {
-        // if (!vectorCompare(movePacket.pos, ZERO)){
-        // if (getFlag(FLAGS_WARP)){
-        //     playerPos = movePacket.pos;
-        //     return true;
-        // }
-        // if (getFlag(FLAGS_ROCK_MOVED)){
-        //     Vector2i rockOldPos = vectorAdd(playerPos, move);
-        //     if (getItemInLayer(rockOldPos, true) == 'R'){
-        //         setItemInLayer('.', rockOldPos, true);
-        //     }
-        //     if (getItemInLayer(rockOldPos, false) == '_'){
-        //         setOnTop('R');
-        //         releasePlate(rockOldPos);
-        //     } else {
-        //         switch (getItemInLayer(playerPos, false)){
-        //             case '_':
-        //                 pressPlate(playerPos);
-        //             case '.':
-        //             case 'D':
-        //                 setOnTop('R');
-        //                 break;
-        //         }
-        //     }
-        // }
     }
     playerPos = newPos;
     setOnTop(map[playerPos.y][playerPos.x]);
@@ -364,9 +339,6 @@ bool placeNode(){
 
 void openChest(){
     undoCount++;
-    // if (playerPos.x == 15 && playerPos.y == 4){
-    //     infoBox("You found a chest!");
-    // }
     ChestLoot loot = getChestLoot(playerPos);
     if (loot.loot != '\0'){
         int i;
@@ -551,7 +523,6 @@ bool handleInput(){
     // movePacket.usedItem.item = 0;
     // printf("%c\n", getOnTop());
 
-    // setFlag(FLAGS_ROCK_MOVED, false);
     if (getFlag(FLAGS_DEATH)){
         if (checkKey(KEY_Z)){
             goto undo; // yes i'm using goto shut up
@@ -685,10 +656,7 @@ undo:   if (moveHistoryIndex > 0){
         }
         if (usedItem > 0){
             useItem(movePacket.items[usedItem-1]);
-            movePacket.items[usedItem-1] = ' '; 
-            // switch (usedItem){
-            //     case 'g': 
-            // }
+            movePacket.items[usedItem-1] = ' ';
         }
         if (isDead){
             setFlag(FLAGS_DEATH, true);
@@ -795,7 +763,13 @@ void updateGame(){
         }
     }
     visibleMap[(visibleMapSize.x + 1) * center.y + center.x] = '@';
-    if (!getFlag(FLAGS_DEATH)) colorItem((visibleMapSize.x + 1) * center.y + center.x, '@');
+    if (!getFlag(FLAGS_DEATH)){
+        if (getFlag(FLAGS_GHOST_MODE)){
+            colorItem((visibleMapSize.x + 1) * center.y + center.x, 'g');
+        } else {
+            colorItem((visibleMapSize.x + 1) * center.y + center.x, '@');
+        }
+    }
     SetShaderValueV(shader, ShaderParams.modulate, visibleMapColors, SHADER_UNIFORM_VEC4, (visibleMapSize.x+1) * visibleMapSize.y);
 
     // printf("%d\n", moveHistory[moveHistoryIndex-1].movedObjectCount);

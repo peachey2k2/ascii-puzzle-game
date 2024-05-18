@@ -20,6 +20,9 @@ void colorItem(int pos, char item){
         case '@':
             addColorToVisibleMap(pos, 0.2, 0.4, 1, 1);
             break;
+        case 'g':
+            addColorToVisibleMap(pos, 0.2, 0.4, 1, 0.5);
+            break;
         case 'A':
         case 'B':
         case 'a':

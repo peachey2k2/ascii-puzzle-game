@@ -6,6 +6,7 @@
 #include "dialogue.h"
 #include "chests.h"
 #include "doors.h"
+#include "teleporters.h"
 
 enum FLAGS{
     FLAGS_DEATH,
@@ -59,6 +60,9 @@ DoorInfo doorInfo[500];
 int doorInfoCount;
 PlateInfo plateInfo[500];
 int plateInfoCount;
+
+TeleporterInfo teleporterInfo[500];
+int teleporterInfoCount;
 
 
 #endif

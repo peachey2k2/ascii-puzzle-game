@@ -365,18 +365,20 @@ OBJ_DIR = obj
 # Define all object files from source files
 # SRC = $(call rwildcard, *.c, *.h) # this does not work >:(
 SRC = \
-    global.c    \
-    global.h    \
-    color.c     \
-    color.h     \
-    dialogue.c  \
-    dialogue.h  \
-    chests.c    \
-    chests.h    \
-    doors.c     \
-    doors.h     \
-    main.c      \
-    main.h      \
+    global.c      \
+    global.h      \
+    color.c       \
+    color.h       \
+    dialogue.c    \
+    dialogue.h    \
+    chests.c      \
+    chests.h      \
+    doors.c       \
+    doors.h       \
+    teleporters.c \
+    teleporters.h \
+    main.c        \
+    main.h        \
 
 SRC := $(addprefix $(SRC_DIR)/, $(SRC))
 

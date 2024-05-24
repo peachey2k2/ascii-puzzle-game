@@ -54,6 +54,12 @@ void colorItem(int pos, char item){
         case 'V':
             addColorToVisibleMap(pos, 0.7, 0.9, 0.7, 1);
             break;
+        case 'T':
+            addColorToVisibleMap(pos, 0.8, 0.1, 0.6, 1);
+            break;
+        case 'x':
+            addColorToVisibleMap(pos, 0.6, 0.05, 0.4, 1);
+            break;
         default:
             addColorToVisibleMap(pos, 0.5, 0.5, 0.5, 1);
             break;

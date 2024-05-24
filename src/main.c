@@ -219,6 +219,11 @@ bool moveTo(int key, bool undo){
                         return false;
                     }
                     break;
+                case 'T':
+                    warpFlag = true;
+                    movePacket.pos = newPos;
+                    newPos = getTeleporterInfo(newPos).dest;
+                    break;
                 case 'R':
                     Vector2i rockNewPos = vectorAdd(newPos, move);
                     // bool conveyored = false;
@@ -563,28 +568,26 @@ undo:   if (moveHistoryIndex > 0){
             if (getFlag(FLAGS_SANDWICH)){
                 stamina -= 400;
             }
-
+            // why did i do this
             switch (movePacket.button){
-                case KEY_UP:
-                    movePacket.button = KEY_UP;
-                    break;
-                case KEY_DOWN:
-                    movePacket.button = KEY_DOWN;
-                    break;
-                case KEY_LEFT:
-                    movePacket.button = KEY_LEFT;
-                    break;
-                case KEY_RIGHT:
-                    movePacket.button = KEY_RIGHT;
-                    break;
+                // case KEY_UP:
+                //     movePacket.button = KEY_UP;
+                //     break;
+                // case KEY_DOWN:
+                //     movePacket.button = KEY_DOWN;
+                //     break;
+                // case KEY_LEFT:
+                //     movePacket.button = KEY_LEFT;
+                //     break;
+                // case KEY_RIGHT:
+                //     movePacket.button = KEY_RIGHT;
+                //     break;
                 case KEY_X:
-                    // printf("%c 1\n", getOnTop());
                     undoInteract();
                     break;
             }
             if (movePacket.button != 0) moveTo(movePacket.button, true);
             movePacket.button = 0;
-
 
             stamina++;
             undoCount++;
@@ -686,6 +689,8 @@ void killTile(Vector2i pos, char tile, bool prev){
         case 'V':
         case '<':
         case '>':
+        case 'T':
+        case 'x':
             return;
         case 'k':
             setOnTop('.');
@@ -944,6 +949,12 @@ void validateData(){
                         errorCount++;
                     }
                     break;
+                case 'T':
+                    if (!teleporterInfoExists((Vector2i){j, i})){
+                        printf("[error] missing teleporter for %d,%d\n", j, i);
+                        errorCount++;
+                    }
+                    break;
             }
             switch (layer2[i][j]){
                 case 'A':
@@ -989,6 +1000,7 @@ int main(){
     readChestLoot();
     readDoors();
     readPlates();
+    readTeleporters();
 
     for (int i=0; i<multiSpawnCount; i++){
         pressPlate(multiSpawns[i]);

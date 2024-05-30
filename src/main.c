@@ -49,6 +49,9 @@ MovePacket movePacket;
 bool cycle = false;
 // int flags;
 
+Vector2 mousePos;
+Vector2i guideBuf[100];
+
 void killTile(Vector2i pos, char tile, bool prev);
 bool isEnemy(char c);
 
@@ -297,6 +300,27 @@ bool moveTo(int key, bool undo){
         // setFlag(FLAGS_GHOST_MODE, false);
     }
     return true;
+}
+
+void findGuidePoints(Vector2i sel){
+    int guideBufSize = 0;
+    switch (getItemInLayer(sel, false)){
+        case 'D':
+            DoorInfo door = getDoorInfo(sel);
+            for (int i=0; i<plateInfoCount; i++){
+                if (plateInfo[i].id == door.id){
+                    guideBuf[guideBufSize++] = plateInfo[i].pos;
+                }
+            }
+        case '_':
+            PlateInfo plate = getPlateInfo(sel);
+            for (int i=0; i<doorInfoCount; i++){
+                if (doorInfo[i].id == plate.id){
+                    guideBuf[guideBufSize++] = doorInfo[i].pos;
+                }
+            }
+    }
+    guideBuf[guideBufSize].x = -1;
 }
 
 bool checkKey(int key){
@@ -816,6 +840,15 @@ static void UpdateDrawFrame(){
 
     #endif
 
+    mousePos = GetMousePosition();
+    guideBuf[0].x = -1;
+    Vector2i sel;
+    if (CheckCollisionPointRec(mousePos, (Rectangle){10, 10, 620, 420})){
+        sel = toMapPosV((Vector2i){(int)(mousePos.x - 10) / 20, (int)(mousePos.y - 10) / 20});
+        findGuidePoints(sel);
+        // printf("%d, %d\n", sel.x, sel.y);
+    }
+
     BeginDrawing();
     
         ClearBackground(BLACK);
@@ -841,6 +874,16 @@ static void UpdateDrawFrame(){
         
         // anything under here will only be rendered inside the white rectangle
         BeginScissorMode(10, 10, 620, 420);
+
+            if (guideBuf[0].x != -1){
+                int guidePtr = 0;
+                Vector2 selScr = getScreenPos(sel);
+                DrawRectangleLinesEx((Rectangle){selScr.x-10, selScr.y-10, 20, 20}, 1.0, ORANGE);
+                while (guideBuf[guidePtr].x != -1){
+                    DrawLineEx(selScr, getScreenPos(guideBuf[guidePtr]), 1, ORANGE);
+                    guidePtr++;
+                }
+            }
 
             BeginShaderMode(shader);
                 DrawTextEx(font, visibleMap, (Vector2){15, 13}, 16, 9.5, WHITE);

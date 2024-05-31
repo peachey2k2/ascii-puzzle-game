@@ -14,6 +14,7 @@ enum FLAGS{
     FLAGS_WARP,
     FLAGS_APPLE,
     FLAGS_SANDWICH,
+    FLAGS_GLASSES,
 };
 
 struct ShaderParams{

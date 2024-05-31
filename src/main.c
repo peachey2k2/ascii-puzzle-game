@@ -319,6 +319,17 @@ void findGuidePoints(Vector2i sel){
                     guideBuf[guideBufSize++] = doorInfo[i].pos;
                 }
             }
+        case 'T':
+            TeleporterInfo teleporter = getTeleporterInfo(sel);
+            guideBuf[guideBufSize++] = teleporter.dest;
+            break;
+        case 'x':
+            for (int i=0; i<teleporterInfoCount; i++){
+                if (vectorCompare(teleporterInfo[i].dest, sel)){
+                    guideBuf[guideBufSize++] = teleporterInfo[i].pos;
+                }
+            }
+            break;
     }
     guideBuf[guideBufSize].x = -1;
 }
@@ -371,20 +382,25 @@ void openChest(){
     ChestLoot loot = getChestLoot(playerPos);
     if (loot.loot != '\0'){
         int i;
-        for (i=0; i<5; i++){
-            if (movePacket.items[i] == ' '){
-                // movePacket.items[i] = loot.loot; // trolled
-                break;
+        if (loot.loot == 'G'){
+            setFlag(FLAGS_GLASSES, true);
+        } else {
+            for (i=0; i<5; i++){
+                if (movePacket.items[i] == ' '){
+                    // movePacket.items[i] = loot.loot; // trolled
+                    break;
+                }
+            }
+            if (i == 5){
+                infoBox("Your inventory is full!");
+                return;
+            } else {
+                // movePacket.items[0] = loot.loot;
+                addedItem = loot.loot;
             }
         }
-        if (i == 5){
-            infoBox("Your inventory is full!");
-        } else {
-            // movePacket.items[0] = loot.loot;
-            addedItem = loot.loot;
-            infoBox(loot.text);
-            setOnTop('c');
-        }
+        infoBox(loot.text);
+        setOnTop('c');
     }
 }
 
@@ -466,9 +482,11 @@ void useItem(char item){
         case 'a':
             moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_APPLE;
             stamina += 200;
+            break;
         case 's':
             moveHistory[moveHistoryIndex-1].flags |= 1 << FLAGS_SANDWICH;
             stamina += 400;
+            break;
     }
 }
 
@@ -633,8 +651,6 @@ undo:   if (moveHistoryIndex > 0){
         out = false;
         for (int i = 1; i <= 5; i++){
             if (isItemUsable(i) && checkKey(KEY_ZERO + i)){
-                // useItem(movePacket.items[i-1]);
-                // movePacket.items[i-1] = ' ';
                 usedItem = i;
                 moved = true;
                 out = true;
@@ -830,28 +846,28 @@ static void UpdateDrawFrame(){
     if (IsKeyUp(KEY_Z)) consecutiveUndos = 0;
     if (handleInput())  updateGame();
 
-    #ifdef ENABLE_ON_SCREEN_COORDS
-
-        DrawRectangle(0, 0, 100, 20, BLACK);
-        sprintf(temp, "%d", playerPos.x);
-        DrawTextEx(font, temp, (Vector2){0, 435}, 10, 10, WHITE);
-        sprintf(temp, "%d", playerPos.y);
-        DrawTextEx(font, temp, (Vector2){0, 445}, 10, 10, WHITE);
-
-    #endif
-
-    mousePos = GetMousePosition();
     guideBuf[0].x = -1;
     Vector2i sel;
-    if (CheckCollisionPointRec(mousePos, (Rectangle){10, 10, 620, 420})){
-        sel = toMapPosV((Vector2i){(int)(mousePos.x - 10) / 20, (int)(mousePos.y - 10) / 20});
-        findGuidePoints(sel);
-        // printf("%d, %d\n", sel.x, sel.y);
+    if (getFlag(FLAGS_GLASSES)){
+        mousePos = GetMousePosition();
+        if (CheckCollisionPointRec(mousePos, (Rectangle){10, 10, 620, 420})){
+            sel = toMapPosV((Vector2i){(int)(mousePos.x - 10) / 20, (int)(mousePos.y - 10) / 20});
+            findGuidePoints(sel);
+            // printf("%d, %d\n", sel.x, sel.y);
+        }
     }
 
     BeginDrawing();
     
         ClearBackground(BLACK);
+
+        #ifdef ENABLE_ON_SCREEN_COORDS
+        DrawRectangle(0, 0, 100, 20, BLACK);
+        sprintf(temp, "%d", playerPos.x);
+        DrawTextEx(font, temp, (Vector2){0, 435}, 10, 10, WHITE);
+        sprintf(temp, "%d", playerPos.y);
+        DrawTextEx(font, temp, (Vector2){0, 445}, 10, 10, WHITE);
+        #endif
 
         DrawRectangleLinesEx((Rectangle){5, 5, 630, 430}, 2.0, WHITE);
 

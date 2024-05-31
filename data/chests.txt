@@ -7,3 +7,4 @@
 198 52 s :you are so greedy
 254 60 a :its color seems off
 255 60 m :how will a magnet help?
+177 76 G :    's glasses.

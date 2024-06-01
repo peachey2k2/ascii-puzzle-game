@@ -49,6 +49,8 @@ MovePacket movePacket;
 bool cycle = false;
 // int flags;
 
+int deferredFlags = 0;
+
 Vector2 mousePos;
 Vector2i guideBuf[100];
 
@@ -75,6 +77,14 @@ bool getFlag(int flag){
 }
 void setFlag(int flag, bool value){
     movePacket.flags = value ? movePacket.flags | (1 << flag) : movePacket.flags & ~(1 << flag);
+}
+
+void setFlagDeferred(int flag, bool value){
+    moveHistory[moveHistoryIndex-1].flags = value ? moveHistory[moveHistoryIndex-1].flags | (1 << flag) : moveHistory[moveHistoryIndex-1].flags & ~(1 << flag);
+    if (getFlag(flag) != value){
+        deferredFlags = deferredFlags | (1 << flag);
+    }
+        
 }
 
 Vector2 getScreenPos(Vector2i gridPos){
@@ -383,7 +393,9 @@ void openChest(){
     if (loot.loot != '\0'){
         int i;
         if (loot.loot == 'G'){
-            setFlag(FLAGS_GLASSES, true);
+            
+            // setFlag(FLAGS_GLASSES, true);
+            setFlagDeferred(FLAGS_GLASSES, true);
         } else {
             for (i=0; i<5; i++){
                 if (movePacket.items[i] == ' '){
@@ -687,6 +699,10 @@ undo:   if (moveHistoryIndex > 0){
         }
         if (getFlag(FLAGS_SANDWICH)){
             setFlag(FLAGS_SANDWICH, false);
+        }
+        if (deferredFlags > 0){
+            movePacket.flags ^= deferredFlags;
+            deferredFlags = 0;
         }
         if (addedItem != '\0'){
             for (int i=0; i<5; i++){

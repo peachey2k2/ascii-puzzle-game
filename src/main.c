@@ -54,6 +54,8 @@ int deferredFlags = 0;
 Vector2 mousePos;
 Vector2i guideBuf[100];
 
+Vector2 glassesFactor = {0, 0};
+
 void killTile(Vector2i pos, char tile, bool prev);
 bool isEnemy(char c);
 
@@ -80,14 +82,20 @@ void setFlag(int flag, bool value){
 }
 
 void setFlagDeferred(int flag, bool value){
-    moveHistory[moveHistoryIndex-1].flags = value ? moveHistory[moveHistoryIndex-1].flags | (1 << flag) : moveHistory[moveHistoryIndex-1].flags & ~(1 << flag);
+    // moveHistory[moveHistoryIndex-1].flags = value ? moveHistory[moveHistoryIndex-1].flags | (1 << flag) : moveHistory[moveHistoryIndex-1].flags & ~(1 << flag);
     if (getFlag(flag) != value){
         deferredFlags = deferredFlags | (1 << flag);
     }
-        
 }
 
 Vector2 getScreenPos(Vector2i gridPos){
+    return (Vector2){
+        (gridPos.x - playerPos.x) * 20 + 320 + glassesFactor.x,
+        (gridPos.y - playerPos.y) * 20 + 220 + glassesFactor.y
+    };
+}
+
+Vector2 getScreenPosNoShift(Vector2i gridPos){
     return (Vector2){(gridPos.x - playerPos.x) * 20 + 320, (gridPos.y - playerPos.y) * 20 + 220};
 }
 
@@ -303,7 +311,12 @@ bool moveTo(int key, bool undo){
             }
         }
     }
+    Vector2i finalMovement = vectorAdd(newPos, vectorInvert(playerPos));
     playerPos = newPos;
+    glassesFactor = (Vector2){
+        finalMovement.x*20 + glassesFactor.x,
+        finalMovement.y*20 + glassesFactor.y
+    };
     setOnTop(map[playerPos.y][playerPos.x]);
     if (!undo){
         moveHistory[moveHistoryIndex].button = key;
@@ -507,7 +520,7 @@ void moveEnemy(char enemy, Vector2i pos){
     switch (enemy){
         case 'e':
             if (vectorCompare(playerPos, pos)){
-                // setFlag(FLAGS_DEATH, true);
+                // setFlag(FLAGS_DEATH, true); // nah i'd win.
             } else if (playerPos.x == pos.x){
                 if (playerPos.y > pos.y){
                     if (isMoveable(pos, DOWN)) newPos = vectorAdd(pos, DOWN);
@@ -814,7 +827,7 @@ void updateGame(){
             colorItem(pos, item);
 
             if (NodePositions.a.x > 0 && NodePositions.b.x > 0){
-                if (CheckCollisionPointLine(getScreenPos(truePos), getScreenPos(NodePositions.a), getScreenPos(NodePositions.b), 11)){
+                if (CheckCollisionPointLine(getScreenPosNoShift(truePos), getScreenPosNoShift(NodePositions.a), getScreenPosNoShift(NodePositions.b), 11)){
                     if (vectorCompare(truePos, playerPos) && (getOnTop() == 'A' || getOnTop() == 'B')) continue;
                     if (item == 'A' || item == 'B') continue;
                     addColorToVisibleMap(pos, 1, 0, 0, 1);
@@ -873,6 +886,13 @@ static void UpdateDrawFrame(){
         }
     }
 
+    if (getFlag(FLAGS_GLASSES)){
+        glassesFactor = (Vector2){glassesFactor.x * 0.85, glassesFactor.y * 0.85};
+    } else {
+        glassesFactor = (Vector2){0, 0};
+    }
+    SetShaderValue(shader, ShaderParams.offset, (int[]){10 + glassesFactor.x, 12 + glassesFactor.y}, SHADER_UNIFORM_IVEC2);
+
     BeginDrawing();
     
         ClearBackground(BLACK);
@@ -910,15 +930,17 @@ static void UpdateDrawFrame(){
             if (guideBuf[0].x != -1){
                 int guidePtr = 0;
                 Vector2 selScr = getScreenPos(sel);
+                selScr = (Vector2){selScr.x + glassesFactor.x, selScr.y + glassesFactor.y};
                 DrawRectangleLinesEx((Rectangle){selScr.x-10, selScr.y-10, 20, 20}, 1.0, ORANGE);
                 while (guideBuf[guidePtr].x != -1){
-                    DrawLineEx(selScr, getScreenPos(guideBuf[guidePtr]), 1, ORANGE);
+                    Vector2 endPos = getScreenPos(guideBuf[guidePtr]);
+                    DrawLineEx(selScr, endPos, 1, ORANGE);
                     guidePtr++;
                 }
             }
 
             BeginShaderMode(shader);
-                DrawTextEx(font, visibleMap, (Vector2){15, 13}, 16, 9.5, WHITE);
+                DrawTextEx(font, visibleMap, (Vector2){15 + glassesFactor.x, 13 + glassesFactor.y}, 16, 9.5, WHITE);
             EndShaderMode();
 
             if (NodePositions.a.x > 0 && NodePositions.b.x > 0){
@@ -1121,6 +1143,7 @@ int main(){
     font = LoadFont("resources/Monocraft.otf");
     shader = LoadShader("shaders/color.vs", "shaders/color.fs");
     shiftingColors = LoadImageColors(LoadImage("resources/shifting.png"));
+    ShaderParams.offset = GetShaderLocation(shader, "offset");
     ShaderParams.modulate = GetShaderLocation(shader, "modulate");
     ShaderParams.shifting = GetShaderLocation(shader, "shifting");
     SetTextLineSpacing(20);

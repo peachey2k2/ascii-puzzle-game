@@ -17,14 +17,14 @@ out vec4 fragColor;
 const int width = 31;
 const int height = 21;
 const int cellSize = 20;
-const ivec2 borderSize = ivec2(10, 12);
+uniform ivec2 offset;
 uniform vec4 modulate[(width+1)*height];
 uniform vec4 shifting;
 
 ivec2 getPos(){
     ivec2 pos;
-    pos.x = (int(vertexPosition.x) - borderSize.x) / cellSize;
-    pos.y = (int(vertexPosition.y) - borderSize.y) / cellSize;
+    pos.x = (int(vertexPosition.x) - offset.x) / cellSize;
+    pos.y = (int(vertexPosition.y) - offset.y) / cellSize;
     return pos;
 }
 

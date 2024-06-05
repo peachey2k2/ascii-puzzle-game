@@ -18,6 +18,7 @@ enum FLAGS{
 };
 
 struct ShaderParams{
+    int offset;
     int modulate;
     int shifting;
 };

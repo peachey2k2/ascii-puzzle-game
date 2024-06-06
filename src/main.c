@@ -313,10 +313,12 @@ bool moveTo(int key, bool undo){
     }
     Vector2i finalMovement = vectorAdd(newPos, vectorInvert(playerPos));
     playerPos = newPos;
-    glassesFactor = (Vector2){
-        finalMovement.x*20 + glassesFactor.x,
-        finalMovement.y*20 + glassesFactor.y
-    };
+    if (getFlag(FLAGS_GLASSES)){
+        glassesFactor = (Vector2){
+            finalMovement.x*20 + glassesFactor.x,
+            finalMovement.y*20 + glassesFactor.y
+        };
+    }
     setOnTop(map[playerPos.y][playerPos.x]);
     if (!undo){
         moveHistory[moveHistoryIndex].button = key;
@@ -872,8 +874,14 @@ static void UpdateDrawFrame(){
     if (shiftingIndex > 35) shiftingIndex = 0; 
     SetShaderValue(shader, ShaderParams.shifting, (float[]){shiftingColor.r, shiftingColor.g, shiftingColor.b, 255}, SHADER_UNIFORM_VEC4);
 
+    if (getFlag(FLAGS_GLASSES)){
+        glassesFactor = (Vector2){glassesFactor.x * 0.85, glassesFactor.y * 0.85};
+    } else {
+        glassesFactor = (Vector2){0, 0};
+    }
+
     if (IsKeyUp(KEY_Z)) consecutiveUndos = 0;
-    if (handleInput())  updateGame();
+    if (handleInput()) updateGame();
 
     guideBuf[0].x = -1;
     Vector2i sel;
@@ -881,16 +889,17 @@ static void UpdateDrawFrame(){
         mousePos = GetMousePosition();
         if (CheckCollisionPointRec(mousePos, (Rectangle){10, 10, 620, 420})){
             sel = toMapPosV((Vector2i){
-                (int)(mousePos.x - 10 - glassesFactor.x) / 20,
-                (int)(mousePos.y - 10 - glassesFactor.y) / 20
+                (int)(mousePos.x + 30 - glassesFactor.x) / 20,
+                (int)(mousePos.y + 30 - glassesFactor.y) / 20
             });
             findGuidePoints(sel);
         }
-        glassesFactor = (Vector2){glassesFactor.x * 0.85, glassesFactor.y * 0.85};
-    } else {
-        glassesFactor = (Vector2){0, 0};
     }
-    SetShaderValue(shader, ShaderParams.offset, (int[]){10 + glassesFactor.x, 12 + glassesFactor.y}, SHADER_UNIFORM_IVEC2);
+
+    SetShaderValue(shader, ShaderParams.offset, (int[]){
+        10 - 40 + glassesFactor.x, // goofy ahh magic numbers
+        11.5 - 40 + glassesFactor.y // tbh idk why 11.5 works better than 12
+    }, SHADER_UNIFORM_IVEC2);
 
     BeginDrawing();
     
@@ -938,7 +947,10 @@ static void UpdateDrawFrame(){
             }
 
             BeginShaderMode(shader);
-                DrawTextEx(font, visibleMap, (Vector2){15 + glassesFactor.x, 13 + glassesFactor.y}, 16, 9.5, WHITE);
+                DrawTextEx(font, visibleMap, (Vector2){
+                    15 + glassesFactor.x - 40,
+                    13 + glassesFactor.y - 40
+                }, 16, 9.5, WHITE);
             EndShaderMode();
 
             if (NodePositions.a.x > 0 && NodePositions.b.x > 0){

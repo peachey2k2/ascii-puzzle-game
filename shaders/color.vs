@@ -14,8 +14,8 @@ out vec2 fragTexCoord;
 out vec4 fragColor;
 
 // NOTE: Add here your custom variables
-const int width = 31;
-const int height = 21;
+const int width = 35;
+const int height = 25;
 const int cellSize = 20;
 uniform ivec2 offset;
 uniform vec4 modulate[(width+1)*height];
@@ -34,11 +34,7 @@ void main(){
 
     // Send vertex attributes to fragment shader
     fragTexCoord = vertexTexCoord;
-    // fragColor = vertexColor;
     fragColor = modColor.r >= 0 ? modColor : shifting/255.0;
-    // fragColor = vec4(float(pos.x) / float(width), float(pos.y) / float(height), 0.0, 1.0);
-    // fragColor = vec4(vertexTexCoord.x / 640.0, vertexTexCoord.y / 480.0, 1.0, 1.0);
-    // fragColor = vec4(0.5, 1.0, 1.0, 1.0);
 
     // Calculate final vertex position
     gl_Position = mvp*vec4(vertexPosition, 1.0);

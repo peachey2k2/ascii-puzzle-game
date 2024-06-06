@@ -50,8 +50,8 @@ typedef struct MovePacket{
 
 const Vector2i windowSize = {640, 480};
 const Vector2i mapSize = {1000, 1000};
-const Vector2i visibleMapSize = {31, 21};
-const Vector2i center = {15, 10};
+const Vector2i visibleMapSize = {35, 25}; // 2 extra tiles for each side
+const Vector2i center = {17, 12};
 
 float *visibleMapColors;
 

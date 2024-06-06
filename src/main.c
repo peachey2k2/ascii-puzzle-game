@@ -880,13 +880,12 @@ static void UpdateDrawFrame(){
     if (getFlag(FLAGS_GLASSES)){
         mousePos = GetMousePosition();
         if (CheckCollisionPointRec(mousePos, (Rectangle){10, 10, 620, 420})){
-            sel = toMapPosV((Vector2i){(int)(mousePos.x - 10) / 20, (int)(mousePos.y - 10) / 20});
+            sel = toMapPosV((Vector2i){
+                (int)(mousePos.x - 10 - glassesFactor.x) / 20,
+                (int)(mousePos.y - 10 - glassesFactor.y) / 20
+            });
             findGuidePoints(sel);
-            // printf("%d, %d\n", sel.x, sel.y);
         }
-    }
-
-    if (getFlag(FLAGS_GLASSES)){
         glassesFactor = (Vector2){glassesFactor.x * 0.85, glassesFactor.y * 0.85};
     } else {
         glassesFactor = (Vector2){0, 0};
@@ -930,7 +929,6 @@ static void UpdateDrawFrame(){
             if (guideBuf[0].x != -1){
                 int guidePtr = 0;
                 Vector2 selScr = getScreenPos(sel);
-                selScr = (Vector2){selScr.x + glassesFactor.x, selScr.y + glassesFactor.y};
                 DrawRectangleLinesEx((Rectangle){selScr.x-10, selScr.y-10, 20, 20}, 1.0, ORANGE);
                 while (guideBuf[guidePtr].x != -1){
                     Vector2 endPos = getScreenPos(guideBuf[guidePtr]);

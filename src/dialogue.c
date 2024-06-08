@@ -7,9 +7,9 @@ extern FILE *dialogueFile;
 extern bool info;
 extern char *infoBoxText;
 
-bool findDialogue(char *ID){
+bool findDialogue(Vector2i pos){
     char line[100], id[30];
-    strcpy(id, ID);
+    sprintf(id, "%d %d", pos.x, pos.y);
     strcat(id, ":");
     // return;
     rewind(dialogueFile);
@@ -23,9 +23,9 @@ bool findDialogue(char *ID){
     return false;
 }
 
-void startDialogue(char *ID){
+void startDialogue(Vector2i pos){
     // strcpy(id, ID);
-    bool result = findDialogue(ID);
+    bool result = findDialogue(pos);
     if (!result){
         printf("Dialogue not found\n");
         return;

@@ -60,6 +60,9 @@ void colorItem(int pos, char item){
         case 'x':
             addColorToVisibleMap(pos, 0.6, 0.05, 0.4, 1);
             break;
+        case '+':
+            addColorToVisibleMap(pos, 0.1, 0.9, 0.1, 1);
+            break;
         default:
             addColorToVisibleMap(pos, 0.5, 0.5, 0.5, 1);
             break;

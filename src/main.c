@@ -436,25 +436,33 @@ void undoChest(){
     setOnTop('C');
 }
 
-bool interact(){
-    bool moved = true;
+bool isNPC(char c){
+    switch (c){
+        case 'k':
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool interact(){ // returns whether the player moved
     // printf("%d\n", getOnTop());
+    if (isNPC(getOnTop())){
+        startDialogue(playerPos);
+        return false;
+    }
     switch (getOnTop()){
         case 'C':
             openChest();
-            break;
+            return true;
         case 'A':
         case 'B':
         case '.':
         case '_':
-            moved = placeNode();
-            break;
-        case 'k':
-            startDialogue("test");
+            return placeNode();
         default:
-            moved = false;
+            return false;
     }
-    return moved;
 }
 
 void undoInteract(){

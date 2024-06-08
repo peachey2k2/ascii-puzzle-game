@@ -35,9 +35,6 @@ void colorItem(int pos, char item){
         case 'c':
             addColorToVisibleMap(pos, 0.4, 0.3, 0.1, 1);
             break;
-        case 'k':
-            addColorToVisibleMap(pos, 0.2, 0.9, 0.2, 1);
-            break;
         case '_':
             addColorToVisibleMap(pos, 0.2, 0.7, 0.9, 1);
             break;
@@ -62,6 +59,13 @@ void colorItem(int pos, char item){
             break;
         case '+':
             addColorToVisibleMap(pos, 0.1, 0.9, 0.1, 1);
+            break;
+        // npcs
+        case 's':
+            addColorToVisibleMap(pos, 0.6, 0.2, 0.2, 1);
+            break;
+        case 'k':
+            addColorToVisibleMap(pos, 0.2, 0.9, 0.2, 1);
             break;
         default:
             addColorToVisibleMap(pos, 0.5, 0.5, 0.5, 1);

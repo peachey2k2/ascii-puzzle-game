@@ -8,15 +8,13 @@ extern bool info;
 extern char *infoBoxText;
 
 bool findDialogue(Vector2i pos){
-    char line[100], id[30];
-    sprintf(id, "%d %d", pos.x, pos.y);
-    strcat(id, ":");
-    // return;
+    char line[30], id[30];
+    sprintf(id, "%d %d:", pos.x, pos.y);
     rewind(dialogueFile);
-    while (fgets(line, 100, dialogueFile) != NULL){
-        strcpy(line, strtok(line, "\n"));
+    while (fgets(line, 30, dialogueFile) != NULL){
+        // strcpy(line, strtok(line, "\n")); // unsafe and broken
+        line[strcspn(line, "\n")] = '\0';
         if (strcmp(line, id) == 0){
-            // dialogueText = line;
             return true;
         }
     }
@@ -24,7 +22,6 @@ bool findDialogue(Vector2i pos){
 }
 
 void startDialogue(Vector2i pos){
-    // strcpy(id, ID);
     bool result = findDialogue(pos);
     if (!result){
         printf("Dialogue not found\n");
@@ -36,7 +33,7 @@ void startDialogue(Vector2i pos){
 
 bool proceedDialogue(){
     for (int i = 0; i < 3; i++){
-        fgets(dialogueText[i], 25, dialogueFile);
+        fgets(dialogueText[i], 27, dialogueFile);
     }
     if (dialogueText[0][0] == '/'){
         // printf("End of dialogue\n");

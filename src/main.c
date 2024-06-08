@@ -439,6 +439,7 @@ void undoChest(){
 bool isNPC(char c){
     switch (c){
         case 'k':
+        case 's':
             return true;
         default:
             return false;

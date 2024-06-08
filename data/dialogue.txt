@@ -1,11 +1,21 @@
+164 18:
+You can press Z to undo
+your last action.
+
+You have limited stamina
+so don't run around
+recklessly.
+Or do, but remember to
+undo afterwards.
+
+/
+217 42:
+Press number keys 1-5 to
+use consumables.
+
+/
 177 79:
-sample text
-
-
-among us
-
-
-test test test test
+placeholder text
 
 
 /

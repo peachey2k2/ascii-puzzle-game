@@ -65,6 +65,7 @@ USE_WAYLAND_DISPLAY   ?= FALSE
 
 SHOW_COORDS           ?= FALSE
 VALIDATE_MAP          ?= FALSE
+DEBUG_BUILD           ?= FALSE
 
 # Determine PLATFORM_OS in case PLATFORM_DESKTOP selected
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
@@ -204,6 +205,10 @@ endif
 
 ifeq ($(VALIDATE_MAP), TRUE)
     CFLAGS += -DENABLE_MAP_VALIDATION
+endif
+
+ifeq ($(DEBUG_BUILD), TRUE)
+    CFLAGS += -DDEBUG_BUILD
 endif
 
 ifeq ($(BUILD_MODE),DEBUG)

@@ -8,6 +8,8 @@
 #include "doors.h"
 #include "teleporters.h"
 
+#define BOUNDARY_CHECK(vec, min, max) (vec.x >= min.x && vec.x < max.x && vec.y >= min.y && vec.y < max.y)
+
 enum FLAGS{
     FLAGS_DEATH,
     FLAGS_GHOST_MODE,

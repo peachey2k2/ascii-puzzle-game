@@ -128,10 +128,22 @@ int releasePlate(Vector2i pos){
 }
 
 char getItemInLayer(Vector2i pos, bool layer){
+    if (!BOUNDARY_CHECK(pos, ZERO, mapSize)){
+        #ifdef DEBUG_BUILD
+        printf("getItemInLayer: (%d, %d) is out of bounds\n", pos.x, pos.y);
+        #endif
+        return 0;
+    }
     return layer ? layer2[pos.y][pos.x] : map[pos.y][pos.x];
 }
 
 void setItemInLayer(char c, Vector2i pos, bool layer){
+    if (!BOUNDARY_CHECK(pos, ZERO, mapSize)){
+        #ifdef DEBUG_BUILD
+        printf("setItemInLayer: (%d, %d) is out of bounds\n", pos.x, pos.y);
+        #endif
+        return;
+    }
     if (layer){
         layer2[pos.y][pos.x] = c;
     } else {
@@ -337,6 +349,7 @@ void findGuidePoints(Vector2i sel){
                     guideBuf[guideBufSize++] = plateInfo[i].pos;
                 }
             }
+            break;
         case '_':
             PlateInfo plate = getPlateInfo(sel);
             for (int i=0; i<doorInfoCount; i++){
@@ -344,6 +357,7 @@ void findGuidePoints(Vector2i sel){
                     guideBuf[guideBufSize++] = doorInfo[i].pos;
                 }
             }
+            break;
         case 'T':
             TeleporterInfo teleporter = getTeleporterInfo(sel);
             guideBuf[guideBufSize++] = teleporter.dest;

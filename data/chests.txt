@@ -1,6 +1,7 @@
 2 2 g :a pinch of ghost powder
 3 2 m :warp to a node
 4 2 a :keeps the doctors away
+5 2 G :    's glasses.
 216 42 a :keeps the doctors away
 133 36 g :a pinch of ghost powder
 156 50 s :eat before she sees

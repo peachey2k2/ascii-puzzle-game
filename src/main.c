@@ -753,7 +753,8 @@ undo:   if (moveHistoryIndex > 0){
         }
         if (usedItem > 0){
             useItem(movePacket.items[usedItem-1]);
-            movePacket.items[usedItem-1] = ' ';
+            if  (movePacket.items[usedItem-1] != 'm')
+                movePacket.items[usedItem-1] = ' ';
         }
         if (isDead){
             setFlag(FLAGS_DEATH, true);

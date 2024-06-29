@@ -866,6 +866,8 @@ void updateGame(){
     if (!getFlag(FLAGS_DEATH)){
         if (getFlag(FLAGS_GHOST_MODE)){
             colorItem((visibleMapSize.x + 1) * center.y + center.x, 'g');
+        } else if (getItem(playerPos) == 'R'){
+            colorItem((visibleMapSize.x + 1) * center.y + center.x, 'R');
         } else {
             colorItem((visibleMapSize.x + 1) * center.y + center.x, '@');
         }

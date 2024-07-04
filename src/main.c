@@ -786,6 +786,7 @@ void killTile(Vector2i pos, char tile, bool prev){
         case '>':
         case 'T':
         case 'x':
+        case 'C':
             return;
         case 'k':
             setOnTop('.');
@@ -939,27 +940,27 @@ static void UpdateDrawFrame(){
         DrawTextEx(font, temp, (Vector2){0, 445}, 10, 10, WHITE);
         #endif
 
-        DrawRectangleLinesEx((Rectangle){5, 5, 630, 430}, 2.0, WHITE);
+        DrawRectangleLinesEx((Rectangle){20, 20, 600, 400}, 2.0, WHITE);
 
-        DrawTextEx(font, "items", (Vector2){35, 443}, 16, 9.5, CYAN);
-        DrawTextEx(font, "undos", (Vector2){195, 443}, 16, 9.5, CYAN);
-        DrawTextEx(font, "stmna", (Vector2){355, 443}, 16, 9.5, CYAN);
-        DrawTextEx(font, "timer", (Vector2){515, 443}, 16, 9.5, CYAN);
+        DrawTextEx(font, "items", (Vector2){35, 433}, 16, 9.5, CYAN);
+        DrawTextEx(font, "undos", (Vector2){195, 433}, 16, 9.5, CYAN);
+        DrawTextEx(font, "stmna", (Vector2){355, 433}, 16, 9.5, CYAN);
+        DrawTextEx(font, "timer", (Vector2){515, 433}, 16, 9.5, CYAN);
 
         sprintf(temp, "%s", movePacket.items);
-        DrawTextEx(font, temp, (Vector2){35, 463}, 16, 9.5, WHITE);
+        DrawTextEx(font, temp, (Vector2){35, 453}, 16, 9.5, WHITE);
 
         sprintf(temp, "%05d", undoCount);
-        DrawTextEx(font, undoCount < 99999 ? temp : "99999", (Vector2){195, 463}, 16, 9.5, WHITE);
+        DrawTextEx(font, undoCount < 99999 ? temp : "99999", (Vector2){195, 453}, 16, 9.5, WHITE);
 
         sprintf(temp, "%05d", stamina);
-        DrawTextEx(font, temp, (Vector2){355, 463}, 16, 9.5, WHITE);
+        DrawTextEx(font, temp, (Vector2){355, 453}, 16, 9.5, WHITE);
 
         sprintf(temp, "%02d:%02d", inGameClockTimer/60, inGameClockTimer%60);
-        DrawTextEx(font, temp, (Vector2){515, 463}, 16, 9.5, WHITE);
+        DrawTextEx(font, temp, (Vector2){515, 453}, 16, 9.5, WHITE);
         
         // anything under here will only be rendered inside the white rectangle
-        BeginScissorMode(10, 10, 620, 420);
+        BeginScissorMode(30, 30, 580, 380);
 
             if (guideBuf[0].x != -1){
                 int guidePtr = 0;
@@ -1174,7 +1175,7 @@ int main(){
 
     printf("----- initializing window -----\n");
 
-    InitWindow(windowSize.x, windowSize.y, "raylib [core] example - basic window");
+    InitWindow(windowSize.x, windowSize.y, "game");
 
     font = LoadFont("resources/Monocraft.otf");
     shader = LoadShader("shaders/color.vs", "shaders/color.fs");
